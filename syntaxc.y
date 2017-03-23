@@ -12,42 +12,59 @@ CODE: primary_identifier EOC {printf("Code Accepted\n");exit(0);}
 ;
 
 
-translation-unit:
-external-declaration
-translation-unit external-declaration
-external-declaration:
-function-definition
-declaration
-function-definition:
-declaration-specifiers opt declarator declaration-list opt compound-statement
-declaration:
-declaration-specifiers init-declarator-list opt ;
-declaration-list:
-declaration
-declaration-list declaration
-declaration-specifiers:
-storage-class-specifier declaration-specifiers opt
-type-specifier declaration-specifiers opt
-type-qualifier declaration-specifiers opt
-storage-class specifier: one of
-auto register static extern typedef
-type specifier: one of
-void char short int long float double signed
-unsigned struct-or-union-specifier enum-specifier typedef-name194
-type-qualifier: one of
-const volatile
-struct-or-union-specifier:
-struct-or-union identifier opt { struct-declaration-list }
-struct-or-union identifier
-struct-or-union: one of
-struct union
-struct-declaration-list:
-struct declaration
-struct-declaration-list struct declaration
-init-declarator-list:
-init-declarator
-init-declarator-list , init-declarator
+translation_unit:
+external_declaration
+translation_unit external_declaration
 
+external_declaration:
+function_definition
+declaration
+
+function_definition:
+declaration_specifiers opt declarator declaration_list opt compound_statement
+;
+
+declaration:
+declaration_specifiers init_declarator_list ';'
+declaration_specifiers   ';'
+
+
+declaration_list:
+| declaration
+| declaration_list declaration
+;
+declaration_specifiers:
+storage_class_specifier declaration_specifiers opt
+| type_specifier declaration_specifiers opt
+| type_qualifier
+;
+storage_class specifier: one of
+| auto register static extern typedef
+;
+
+type specifier: one of
+| void char short int long float double signed
+| unsigned struct_or_union_specifier enum_specifier typedef_name194
+;
+
+type_qualifier: one of
+const volatile
+| struct_or_union_specifier:
+| struct_or_union identifier opt { struct_declaration_list }
+| struct_or_union identifier
+;
+
+struct_or_union: one of
+| struct union
+| struct_declaration_list:
+| struct declaration
+| struct_declaration_list struct declaration
+;
+
+init_declarator_list:
+| init_declarator
+| init_declarator-list ',' init-declarator
+;
 
 init-declarator:
 declarator
