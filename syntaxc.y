@@ -21,25 +21,34 @@ function_definition
 declaration
 
 function_definition:
-declaration_specifiers opt declarator declaration_list opt compound_statement
+declaration_specifiers opt declarator declaration_list
+|  declarator 
+| declaration_specifiers declarator 
+|  declarator declaration_list
+| declaration_specifiers declarator declaration_list
+| compound_statement
 ;
 
 declaration:
 declaration_specifiers init_declarator_list ';'
 declaration_specifiers   ';'
-
+;
 
 declaration_list:
 | declaration
 | declaration_list declaration
 ;
+
 declaration_specifiers:
-storage_class_specifier declaration_specifiers opt
-| type_specifier declaration_specifiers opt
+storage_class_specifier
+| storage_class_specifier declaration_specifiers
+| type_specifier
+| type_specifier declaration_specifiers
 | type_qualifier
 ;
-storage_class specifier: one of
-| auto register static extern typedef
+
+storage_class_specifier:
+| AUTO | REGISTER | STATIC | EXTERN | TYPEDEF
 ;
 
 type specifier: one of
@@ -50,7 +59,7 @@ type specifier: one of
 type_qualifier: one of
 const volatile
 | struct_or_union_specifier:
-| struct_or_union identifier opt { struct_declaration_list }
+| struct_or_union identifier opt '{' struct_declaration_list '}'
 | struct_or_union identifier
 ;
 
@@ -63,29 +72,37 @@ struct_or_union: one of
 
 init_declarator_list:
 | init_declarator
-| init_declarator-list ',' init-declarator
+| init_declarator_list ',' init_declarator
 ;
 
-init-declarator:
+init_declarator:
 declarator
-declarator = initializer
-struct-declaration:
-specifier-qualifier-list struct-declarator-list ;
-specifier-qualifier-list:
-type-specifier specifier-qualifier-list opt
-type-qualifier specifier-qualifier-list opt
-struct-declarator-list:
-struct-declarator
-struct-declarator-list , struct-declarator
-struct-declarator:
+| declarator '=' initializer
+;
 
+struct_declaration:
+specifier_qualifier_list struct_declarator-list ';'
+;
+
+specifier_qualifier_list:
+type_specifier
+| type_specifier specifier_qualifier_list
+| type_qualifier
+| type_qualifier specifier_qualifier_list
+;
+
+struct_declarator_list:
+struct_declarator
+| struct_declarator_list ',' struct_declarator
+;
+
+struct_declarator:
 declarator
- ':' constant_expression
 | declarator ':' constant_expression
 ;
 
-enum-specifier:
-| '{' enumerator-list '}'
+enum_specifier:
+| '{' enumerator_list '}'
 | enum identifier '{' enumerator_list '}'
 | enum identifier
 ;
@@ -97,7 +114,7 @@ enumerator
 
 enumerator:
 identifier
-identifier '=' constant-expression
+identifier '=' constant_expression
 ;
 
 declarator:
