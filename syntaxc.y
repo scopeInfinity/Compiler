@@ -61,79 +61,141 @@ struct-declarator-list:
 struct-declarator
 struct-declarator-list , struct-declarator
 struct-declarator:
+
 declarator
-declarator opt : constant-expression
+ ':' constant_expression
+| declarator ':' constant_expression
+;
+
 enum-specifier:
-enum identifier opt { enumerator-list }
-enum identifier
-enumerator-list:
+| '{' enumerator-list '}'
+| enum identifier '{' enumerator_list '}'
+| enum identifier
+;
+
+enumerator_list:
 enumerator
-enumerator-list , enumerator
+| enumerator_list ',' enumerator
+;
+
 enumerator:
 identifier
-identifier = constant-expression
+identifier '=' constant-expression
+;
+
 declarator:
-pointer opt direct-declarator
-direct-declarator:
+ direct_declarator
+| pointer direct_declarator
+;
+
+direct_declarator:
 identifier
-( declarator )
-direct-declarator [ constant-expression opt ]195
-direct-declarator ( parameter-type-list )
-direct-declarator ( identifier-list opt )
+| '(' declarator ')'
+| direct_declarator '[' ']'
+| direct_declarator '[' constant_expression ']'
+| direct_declarator '(' parameter_type_list ')'
+| direct_declarator '(' ')'
+| direct_declarator '(' identifier_list ')'
+;
+
 pointer:
-* type-qualifier-list opt
-* type-qualifier-list opt pointer
-type-qualifier-list:
-type-qualifier
-type-qualifier-list type-qualifier
-parameter-type-list:
-parameter-list
-parameter-list , ...
-parameter-list:
-parameter-declaration
-parameter-list , parameter-declaration
-parameter-declaration:
-declaration-specifiers declarator
-declaration-specifiers abstract-declarator opt
-identifier-list:
-identifier
-identifier-list , identifier
+'*' 
+| '*' pointer
+| '*' type_qualifier_list
+| '*' type_qualifier_list pointer
+;
+
+type_qualifier_list:
+type_qualifier
+| type_qualifier_list type_qualifier
+;
+
+parameter_type_list:
+parameter_list
+| parameter_list ',' '.' '.' '.'
+;
+parameter_list:
+| parameter_declaration
+| parameter_list ',' parameter_declaration
+;
+
+parameter_declaration:
+declaration_specifiers declarator
+| declaration_specifiers
+| declaration_specifiers abstract_declarator
+;
+
+identifier_list:
+| identifier
+| identifier_list ',' identifier
+;
+
 initializer:
-assignment-expression
-{ initializer-list }
-{ initializer-list , }
-initializer-list:
+assignment_expression
+'{' initializer_list '}'
+'{' initializer_list ',' '}'
+;
+
+initializer_list:
 initializer
-initializer-list , initializer
-type-name:
-specifier-qualifier-list abstract-declarator opt
-abstract-declarator:
+|initializer_list ',' initializer
+;
+
+type_name:
+specifier_qualifier_list
+| specifier_qualifier_list abstract_declarator
+;
+
+abstract_declarator:
 pointer
-pointer opt direct-abstract-declarator
-direct-abstract-declarator:
-( abstract-declarator )
-direct-abstract-declarator opt [constant-expression opt ]
-direct-abstract-declarator opt (parameter-type-list opt )
+|  direct_abstract_declarator
+| pointer  direct_abstract_declarator
+;
+
+direct_abstract_declarator:
+'(' abstract_declarator ')'
+|  [ ]
+|  [constant_expression ]
+| direct_abstract_declarator [ ]
+| direct_abstract_declarator [constant_expression ]
+|  ( )
+|  (parameter_type_list )
+| direct_abstract_declarator ( )
+| direct_abstract_declarator (parameter_type_list )
+;
 
 
-
-typedef-name:
+typedef_name:
 identifier
+;
+
 statement:
-labeled-statement
-expression-statement
-compound-statement
-selection-statement196
-iteration-statement
-jump-statement
-labeled-statement:
-identifier : statement
-case constant-expression : statement
-default : statement
-expression-statement:
-expression opt ;
-compound-statement:
-{ declaration-list opt statement-list opt }
+labeled_statement
+| expression_statement
+| compound_statement
+| selection_statement
+| iteration_statement
+| jump_statement
+;
+
+labeled_statement:
+identifier ':' statement
+| CASE constant_expression ':' statement
+| DEFAULT ':'' statement
+;
+
+expression_statement:
+expression ';'
+| expression ';'
+
+
+compound_statement:
+'{'   '}'
+|'{'  statement_list '}'
+|'{' declaration_list  '}'
+|'{' declaration_list statement_list '}'
+
+;
 statement-list:
 statement
 statement-list statement
@@ -141,10 +203,20 @@ selection-statement:
 if (expression) statement
 if (expression) statement else statement
 switch (expression) statement
-iteration-statement:
-while (expression) statement
-do statement while (expression) ;
-for (expression opt ; expression opt ; expression opt ) statement
+
+iteration_statement:
+WHILE '(' expression ')' statement
+| DO statement WHILE '(' expression ')' ';'
+| FOR '('  ';'  ';'  ')'
+| FOR '('  ';'  ';' expression ')'
+| FOR '('  ';' expression ';'  ')'
+| FOR '('  ';' expression ';' expression ')'
+| FOR '(' expression ';'  ';'  ')'
+| FOR '(' expression ';'  ';' expression ')'
+| FOR '(' expression ';' expression ';'  ')'
+| FOR '(' expression ';' expression ';' expression ')'
+| statement
+;
 
 jump_statement:
 GOTO identifier ';'
