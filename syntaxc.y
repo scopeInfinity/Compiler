@@ -5,7 +5,7 @@
 #define YYSTYPE char*
 %}
 
-%token integer_constant character_constant floating_constant identifier string SIZEOF EOC AUTO REGISTER STATIC EXTERN TYPEDEF VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED STRUCT_OR_UNION_SPECIFIER ENUM_SPECIFIER TYPEDEF_NAME CONST VOLATILE STRUCT UNION ENUM CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN 
+%token integer_constant character_constant floating_constant identifier string SIZEOF EOC AUTO REGISTER STATIC EXTERN TYPEDEF VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED  CONST VOLATILE STRUCT UNION ENUM CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN 
 
 %start CODE
 %%
@@ -55,12 +55,14 @@ storage_class_specifier:
 
 type_specifier:
 | VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE | SIGNED
-| UNSIGNED | STRUCT_OR_UNION_SPECIFIER | ENUM_SPECIFIER | TYPEDEF_NAME
+| UNSIGNED | struct_or_union_specifier | enum_specifier | typedef_name
 ;
 
 type_qualifier:
 CONST VOLATILE
-| struct_or_union_specifier:
+;
+
+struct_or_union_specifier:
 | struct_or_union '{' struct_declaration_list '}'
 | struct_or_union identifier '{' struct_declaration_list '}'
 | struct_or_union identifier
@@ -68,7 +70,9 @@ CONST VOLATILE
 
 struct_or_union: 
 | STRUCT | UNION
-| struct_declaration_list:
+;
+
+struct_declaration_list:
 | STRUCT declaration
 | struct_declaration_list STRUCT declaration
 ;
