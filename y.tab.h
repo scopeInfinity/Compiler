@@ -1,0 +1,10 @@
+#define integer_constant 257
+#define character_constant 258
+#define floating_constant 259
+#define identifier 260
+#define string 261
+#define SIZEOF 262
+#define EOC 263
+#define type_name 264
+#define primary_expression 265
+#define assignment_expression_list 266

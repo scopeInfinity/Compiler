@@ -1,0 +1,5 @@
+yacc -d $1.y
+lex $1.lex
+gcc y.tab.c lex.yy.c -lm -o $1.out
+
+
