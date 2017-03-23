@@ -5,10 +5,11 @@
 #define YYSTYPE char*
 %}
 
-%token integer_constant character_constant floating_constant identifier string SIZEOF EOC
+%token integer_constant character_constant floating_constant identifier string SIZEOF EOC AUTO REGISTER STATIC EXTERN TYPEDEF VOID CHAR SHORT INT LONG FLOAT DOUBLE SIGNED UNSIGNED STRUCT_OR_UNION_SPECIFIER ENUM_SPECIFIER TYPEDEF_NAME CONST VOLATILE STRUCT UNION ENUM CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN 
+
 %start CODE
 %%
-CODE: primary_identifier EOC {printf("Code Accepted\n");exit(0);}
+CODE: translation_unit EOC {printf("Code Accepted\n");exit(0);}
 ;
 
 
@@ -21,7 +22,8 @@ function_definition
 declaration
 
 function_definition:
-declaration_specifiers opt declarator declaration_list
+declarator declaration_list
+| declaration_specifiers declarator declaration_list
 |  declarator 
 | declaration_specifiers declarator 
 |  declarator declaration_list
@@ -51,23 +53,24 @@ storage_class_specifier:
 | AUTO | REGISTER | STATIC | EXTERN | TYPEDEF
 ;
 
-type specifier: one of
-| void char short int long float double signed
-| unsigned struct_or_union_specifier enum_specifier typedef_name194
+type_specifier:
+| VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE | SIGNED
+| UNSIGNED | STRUCT_OR_UNION_SPECIFIER | ENUM_SPECIFIER | TYPEDEF_NAME
 ;
 
-type_qualifier: one of
-const volatile
+type_qualifier:
+CONST VOLATILE
 | struct_or_union_specifier:
-| struct_or_union identifier opt '{' struct_declaration_list '}'
+| struct_or_union '{' struct_declaration_list '}'
+| struct_or_union identifier '{' struct_declaration_list '}'
 | struct_or_union identifier
 ;
 
-struct_or_union: one of
-| struct union
+struct_or_union: 
+| STRUCT | UNION
 | struct_declaration_list:
-| struct declaration
-| struct_declaration_list struct declaration
+| STRUCT declaration
+| struct_declaration_list STRUCT declaration
 ;
 
 init_declarator_list:
@@ -81,7 +84,7 @@ declarator
 ;
 
 struct_declaration:
-specifier_qualifier_list struct_declarator-list ';'
+specifier_qualifier_list struct_declarator_list ';'
 ;
 
 specifier_qualifier_list:
@@ -103,8 +106,8 @@ declarator
 
 enum_specifier:
 | '{' enumerator_list '}'
-| enum identifier '{' enumerator_list '}'
-| enum identifier
+| ENUM identifier '{' enumerator_list '}'
+| ENUM identifier
 ;
 
 enumerator_list:
@@ -188,14 +191,14 @@ pointer
 
 direct_abstract_declarator:
 '(' abstract_declarator ')'
-|  [ ]
-|  [constant_expression ]
-| direct_abstract_declarator [ ]
-| direct_abstract_declarator [constant_expression ]
-|  ( )
-|  (parameter_type_list )
-| direct_abstract_declarator ( )
-| direct_abstract_declarator (parameter_type_list )
+|  '[' ']'
+|  '['constant_expression ']'
+| direct_abstract_declarator '[' ']'
+| direct_abstract_declarator '['constant_expression ']'
+|  '(' ')'
+|  '('parameter_type_list ')'
+| direct_abstract_declarator '(' ')'
+| direct_abstract_declarator '('parameter_type_list ')'
 ;
 
 
@@ -215,7 +218,7 @@ labeled_statement
 labeled_statement:
 identifier ':' statement
 | CASE constant_expression ':' statement
-| DEFAULT ':'' statement
+| DEFAULT ':' statement
 ;
 
 expression_statement:
@@ -230,13 +233,16 @@ compound_statement:
 |'{' declaration_list statement_list '}'
 
 ;
-statement-list:
+statement_list:
 statement
-statement-list statement
-selection-statement:
-if (expression) statement
-if (expression) statement else statement
-switch (expression) statement
+| statement_list statement
+;
+
+selection_statement:
+| IF '('expression')' statement
+| IF '('expression')' statement ELSE statement
+| SWITCH '('expression')' statement
+;
 
 iteration_statement:
 WHILE '(' expression ')' statement
@@ -369,8 +375,7 @@ primary_expression
 | postfix_expression '-' '-'
 ;
 
-primary_identifier:
-expression
+primary_expression:
 | constant
 | string
 | '(' expression ')'
@@ -378,7 +383,7 @@ expression
 
 argument_expression_list:
 assignment_expression
-| assignment_expression_list ',' assignment_expression
+| argument_expression_list ',' assignment_expression
 ;
 
 constant:
@@ -386,6 +391,7 @@ integer_constant
 | character_constant
 | floating_constant
 ;
+
 
 %%
 int yyerror(char *s) {
