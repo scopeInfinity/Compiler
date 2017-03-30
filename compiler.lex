@@ -114,8 +114,8 @@ L?\"(\\.|[^\\"])*\"	{ trackLines(); return(STRING_LITERAL); }
 "?"			{ trackLines(); return('?'); }
 
 [ \t\v\f]		{ trackLines(); }
-[\n]			{ trackLines(); lineno++;lastlines[lineno][0]='\0';}
-.			{ /* ignore bad characters */ }
+[\n]			{ trackLines(); lineno++;lastlines[lineno][0]='\0'; /* lineno keeps track of index of current Line. Increase lineno on seeing newline.*/}
+.			{ /* ignore bad characters */  }
 
 %%
 
@@ -127,6 +127,7 @@ int yywrap()
 
 void comment()
 {
+	/* ignore comments, increase lineno, also append newline as string to the lastlines array */ 
 	char c, c1;
 
 	loop:
@@ -151,9 +152,12 @@ void comment()
 
 
 int offset = 0;
+/* offset to keep track of which position the parse error occurs. */
 
 void trackLines()
 {
+	/* Append the token to the end of current line in lastlines */
+
 	strcat(lastlines[lineno],yytext);
 	int i;
 	

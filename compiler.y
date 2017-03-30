@@ -430,8 +430,9 @@ function_definition
 %%
 void yyerror(char *s)
 {
+
+	/* */
 	fflush(stdout);
-	
 	int nooflastlines = lineno;
 	if(nooflastlines>10)
 		nooflastlines=10;
