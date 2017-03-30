@@ -42,6 +42,7 @@ IS			(u|U|l|L)*
 "goto"			{ trackLines(); return(GOTO); }
 "if"			{ trackLines(); return(IF); }
 "int"			{ trackLines(); return(INT); }
+"bool"			{ trackLines(); return(BOOL); }
 "long"			{ trackLines(); return(LONG); }
 "register"		{ trackLines(); return(REGISTER); }
 "return"		{ trackLines(); return(RETURN); }

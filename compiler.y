@@ -17,7 +17,7 @@ int yylex();
 %token XOR_ASSIGN OR_ASSIGN TYPE_NAME
 
 %token TYPEDEF EXTERN STATIC AUTO REGISTER
-%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token CHAR SHORT INT BOOL LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
 %token STRUCT UNION ENUM ELLIPSIS
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
@@ -204,6 +204,7 @@ type_specifier
 	| CHAR
 	| SHORT
 	| INT
+	| BOOL
 	| LONG
 	| FLOAT
 	| DOUBLE
@@ -217,7 +218,7 @@ type_specifier
 struct_or_union_specifier
 	: struct_or_union IDENTIFIER '{' struct_declaration_list '}'
 	| struct_or_union '{' struct_declaration_list '}'
-	| struct_or_union IDENTIFIER
+	| struct_or_union IDENTIFIER 	
 	;
 
 struct_or_union
@@ -371,21 +372,21 @@ labeled_statement
 	| DEFAULT ':' statement
 	;
 
+innerstatement
+	: declaration
+	| statement
+	| innerstatement statement
+	| innerstatement declaration
+	;
+
 compound_statement
 	: '{' '}'
-	| '{' statement_list '}'
-	| '{' declaration_list '}'
-	| '{' declaration_list statement_list '}'
+	| '{' innerstatement '}'
 	;
 
 declaration_list
 	: declaration
 	| declaration_list declaration
-	;
-
-statement_list
-	: statement
-	| statement_list statement
 	;
 
 expression_statement
@@ -437,17 +438,22 @@ function_definition
 void yyerror(char *s)
 {
 
-	/* */
 	fflush(stdout);
 	int nooflastlines = lineno;
+
+	//Number of lines to print
 	if(nooflastlines>10)
 		nooflastlines=10;
 	int i;
 	strcat(lastlines[lineno],"\n");
+
+	//Printing Last `nooflastlines` of lines
 	printf("Last %d lines from error\n",nooflastlines);
 	for(i=nooflastlines-1;i>=0;i--) {
 		printf("%-4d:   %s",lineno-i, lastlines[lineno-i]);
 	}
+
+	//Print marker
 	printf("\n%*s\n%*s\n", 8+offset, "^", 8+offset, s);
 	printf("\n%s in line number %d at offset %d\n",s,lineno,offset);
 }
