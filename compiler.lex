@@ -4,6 +4,7 @@
 
 void trackLines();
 void comment();
+void commentSingleLine();
 extern void yyerror();
 int lineno = 1;
 char lastlines[10000][1000];
@@ -22,6 +23,7 @@ IS			(u|U|l|L)*
 
 %%
 "/*"			{ comment(); }
+"//"			{ commentSingleLine(); }
 
 "auto"			{ trackLines(); return(AUTO); }
 "break"			{ trackLines(); return(BREAK); }
@@ -154,6 +156,18 @@ void comment()
 		unput(c1);
 		goto loop;
 	}
+
+}
+
+void commentSingleLine()
+{
+	char c;
+
+	while ((c = input()) != '\n' && c != 0)
+		;
+	strcat(lastlines[lineno],"\n");
+	lineno++;
+	lastlines[lineno][0]='\0';
 
 }
 
