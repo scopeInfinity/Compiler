@@ -5,6 +5,7 @@
 void trackLines();
 int lineno = 1;
 char lastlines[10000][1000];
+
 %}
 
 
@@ -115,7 +116,7 @@ L?\"(\\.|[^\\"])*\"	{ trackLines(); return(STRING_LITERAL); }
 
 [ \t\v\f]		{ trackLines(); }
 [\n]			{ trackLines(); lineno++;lastlines[lineno][0]='\0';}
-.			{ /* ignore bad characters */ }
+.			{ yyerror("Invalid Token");exit(0);}
 
 %%
 
