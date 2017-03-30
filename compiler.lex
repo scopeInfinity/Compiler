@@ -3,6 +3,8 @@
 #include "y.tab.h"
 
 void trackLines();
+void comment();
+extern void yyerror();
 int lineno = 1;
 char lastlines[10000][1000];
 
@@ -54,7 +56,7 @@ IS			(u|U|l|L)*
 "volatile"		{ trackLines(); return(VOLATILE); }
 "while"			{ trackLines(); return(WHILE); }
 
-{L}({L}|{D})*		{ trackLines(); return(check_type()); }
+{L}({L}|{D})*		{ trackLines(); return IDENTIFIER; }
 
 0[xX]{H}+{IS}?		{ trackLines(); return(CONSTANT); }
 0{D}+{IS}?		{ trackLines(); return(CONSTANT); }
@@ -116,7 +118,11 @@ L?\"(\\.|[^\\"])*\"	{ trackLines(); return(STRING_LITERAL); }
 
 [ \t\v\f]		{ trackLines(); }
 [\n]			{ trackLines(); lineno++;lastlines[lineno][0]='\0'; /* lineno keeps track of index of current Line. Increase lineno on seeing newline.*/}
-.			{ yyerror("Invalid Token");exit(0);}
+.		{ 
+			strcat(lastlines[lineno],yytext);
+			yyerror("Invalid Token");
+			exit(0);
+		}
 
 %%
 
@@ -170,23 +176,4 @@ void trackLines()
 		else
 			offset++;
 	}
-}
-
-
-int check_type()
-{
-/*
-* pseudo code --- this is what it should check
-*
-*	if (yytext == type_name)
-*		return(TYPE_NAME);
-*
-*	return(IDENTIFIER);
-*/
-
-/*
-*	it actually will only return IDENTIFIER
-*/
-
-	return(IDENTIFIER);
 }

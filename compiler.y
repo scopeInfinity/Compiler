@@ -1,12 +1,13 @@
 %{
-#include<stdio.h>
-#include<math.h>
-
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
 
 extern char yytext[];
 extern char lastlines[10000][1000];
 extern int offset,lineno;
 
+int yylex();
 %}
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -20,6 +21,9 @@ extern int offset,lineno;
 %token STRUCT UNION ENUM ELLIPSIS
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%nonassoc THEN
+%nonassoc ELSE
 
 %start START
 %%
@@ -390,7 +394,7 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement
+	: IF '(' expression ')' statement %prec THEN
 	| IF '(' expression ')' statement ELSE statement
 	| SWITCH '(' expression ')' statement
 	;
@@ -428,6 +432,8 @@ function_definition
 	;
 
 %%
+
+
 void yyerror(char *s)
 {
 
