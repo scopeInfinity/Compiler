@@ -1,3 +1,14 @@
+%{
+#include<stdio.h>
+#include<math.h>
+
+
+extern char yytext[];
+extern char lastlines[10000][1000];
+extern int offset,lineno;
+
+%}
+
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
@@ -10,9 +21,11 @@
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%start translation_unit
+%start START
 %%
 
+START : translation_unit {printf("Code Compiled Successfully\n");}
+;
 primary_expression
 	: IDENTIFIER
 	| CONSTANT
@@ -415,14 +428,24 @@ function_definition
 	;
 
 %%
-#include <stdio.h>
-
-extern char yytext[];
-extern int column;
-
-yyerror(s)
-char *s;
+void yyerror(char *s)
 {
 	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
+	
+	int nooflastlines = lineno;
+	if(nooflastlines>10)
+		nooflastlines=10;
+	int i;
+	strcat(lastlines[lineno],"\n");
+	printf("Last %d lines from error\n",nooflastlines);
+	for(i=nooflastlines-1;i>=0;i--) {
+		printf("%-4d:   %s",lineno-i, lastlines[lineno-i]);
+	}
+	printf("\n%*s\n%*s\n", 8+offset, "^", 8+offset, s);
+	printf("\n%s in line number %d at offset %d\n",s,lineno,offset);
+}
+
+
+int main(){
+	yyparse();
 }
